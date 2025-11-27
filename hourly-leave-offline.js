@@ -6,7 +6,7 @@
 // - 滿 2 年：第 13–24 筆，基準 2088，10 日
 // - 滿 3 年：第 25–36 筆，基準 2088，14 日
 // - 滿 4 年：第 37–48 筆，基準 2088，14 日
-// - 滿 5 年：第 49–60 筆，基準 2088，14 日
+// - 滿 5 年：第 49–60 筆，基準 2088，15 日
 // - 滿 6 年：第 61–72 筆，基準 2088，15 日
 
 // DOM 元件
@@ -429,7 +429,7 @@ function computeLeaveSummary() {
     { label: "滿 2 年",   indexFrom: 12, length: 12, base: YEAR_BASE_HOURS,      days: 10 }, // 第 13～24 筆
     { label: "滿 3 年",   indexFrom: 24, length: 12, base: YEAR_BASE_HOURS,      days: 14 }, // 第 25～36 筆
     { label: "滿 4 年",   indexFrom: 36, length: 12, base: YEAR_BASE_HOURS,      days: 14 }, // 第 37～48 筆
-    { label: "滿 5 年",   indexFrom: 48, length: 12, base: YEAR_BASE_HOURS,      days: 14 }, // 第 49～60 筆
+    { label: "滿 5 年",   indexFrom: 48, length: 12, base: YEAR_BASE_HOURS,      days: 15 }, // 第 49～60 筆
     { label: "滿 6 年",   indexFrom: 60, length: 12, base: YEAR_BASE_HOURS,      days: 15 }, // 第 61～72 筆
   ];
 
