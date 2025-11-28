@@ -408,8 +408,6 @@ function computeLeaveSummary() {
   const remainMonths    = seniorityMonths % 12;
   const seniorityText   = `${seniorityYears} 年 ${remainMonths} 個月`;
 
-  const H_PER_DAY_LOCAL = HOURS_PER_DAY;
-
   const result = {
     ok: true,
     periodText,
@@ -563,7 +561,7 @@ document.getElementById("clear").onclick = () => {
 };
 
 // ------------------------------
-// 匯出 Excel
+// 匯出 Excel（含到職日＋累計總特休時數）
 // ------------------------------
 document.getElementById("export").onclick = () => {
   const ok = validateHours();
@@ -590,11 +588,28 @@ document.getElementById("export").onclick = () => {
 
   const sheet = [];
 
+  // 標題區
   sheet.push(["累計特休表"]);
   sheet.push([`學號：${studentId || "（未填）"}`]);
   sheet.push([`時薪：${wage > 0 ? wage.toFixed(0) : "—"}`]);
   sheet.push([`服務單位：${unitText || "—"}`]);
-  sheet.push([]);
+
+  // 新增：到職日一列
+  const hireYear  = parseInt(hy.value, 10);
+  const hireMonth = parseInt(hm.value, 10);
+  const hireDay   = parseInt(hd.value, 10);
+  let hireText = "—";
+  if (!isNaN(hireYear) && !isNaN(hireMonth) && !isNaN(hireDay)) {
+    hireText =
+      `${hireYear}-` +
+      `${String(hireMonth).padStart(2, "0")}-` +
+      `${String(hireDay).padStart(2, "0")}`;
+  }
+  sheet.push([`到職日：${hireText}`]);
+
+  sheet.push([]); // 空行
+
+  // 試算結果區
   sheet.push(["試算結果"]);
   sheet.push([`任職區間：${summary.periodText}`]);
   sheet.push([`有效月份數：${summary.validMonths}`]);
@@ -605,6 +620,7 @@ document.getElementById("export").onclick = () => {
   if (summary.validMonths < 6) {
     sheet.push(["有效月份未滿 6 個月，尚無特休"]);
   } else {
+    // 累計總特休：帶上時數 + 真實值
     sheet.push([
       `累計總特休：${summary.totalRounded.toFixed(2)} 小時（真實：${summary.totalRaw.toFixed(2)} 小時）`
     ]);
@@ -615,12 +631,32 @@ document.getElementById("export").onclick = () => {
       sheet.push([
         `累計總不休假獎金：${bonusRounded.toFixed(0)} 元（真實：${bonusRaw.toFixed(0)} 元）`
       ]);
+    } else {
+      sheet.push(["累計總不休假獎金：—（尚未填寫時薪）"]);
     }
+
+    // 各期明細
+    summary.segments.forEach(seg => {
+      sheet.push([`${seg.rangeLabel}｜${seg.label}`]);
+      sheet.push([
+        `本期特休：${seg.rounded.toFixed(2)} 小時（真實：${seg.raw.toFixed(2)} 小時）`
+      ]);
+
+      if (wage > 0) {
+        const bonusRounded = seg.rounded * wage;
+        const bonusRaw     = seg.raw * wage;
+        sheet.push([
+          `本期不休假獎金：${bonusRounded.toFixed(0)} 元（真實：${bonusRaw.toFixed(0)} 元）`
+        ]);
+      } else {
+        sheet.push(["本期不休假獎金：—（尚未填寫時薪）"]);
+      }
+    });
   }
 
   sheet.push([]);
   sheet.push(["每月工時明細"]);
-  sheet.push(["年","月","工時（小時）"]);
+  sheet.push(["年", "月", "工時（小時）"]);
   validSorted.forEach(r => {
     sheet.push([r.year, r.month, r.hours != null ? r.hours.toFixed(1) : ""]);
   });
